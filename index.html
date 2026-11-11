@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>2026臺灣教育科技展 Wayground 抽獎</title>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--bg2:#f2f4f6;--fg:#2c3e50;--mut:#7f8c8d;--line:#d5dbdf;--blue:#3498db;--red:#e74c3c;--green:#27ae60;--nav:#3498db;--navfg:#fff;--field:#fff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1e2a36;--bg2:#2a3846;--fg:#ecf0f1;--mut:#9aa7b0;--line:#3d4d5c;--nav:#2a6fa0;--field:#1e2a36}}
+:root[data-theme="dark"]{--bg:#1e2a36;--bg2:#2a3846;--fg:#ecf0f1;--mut:#9aa7b0;--line:#3d4d5c;--nav:#2a6fa0;--field:#1e2a36}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:'Open Sans','Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif;min-height:100vh}
+
+button{font:inherit;font-weight:700;border:0;cursor:pointer;color:#fff;background:var(--blue);padding:10px 16px}
+button:hover{opacity:.85}
+button:focus-visible,input:focus-visible{outline:3px solid var(--blue);outline-offset:1px}
+input{font:inherit;color:var(--fg);background:var(--field);border:2px solid var(--line);padding:7px 9px;min-width:0;width:100%;border-radius:0}
+input:focus{border-color:var(--blue);outline:none}
+.top{position:fixed;z-index:10;left:0;right:0;top:env(safe-area-inset-top,0px);display:flex;gap:12px;align-items:center;justify-content:space-between;padding:10px 16px;pointer-events:none}
+.top>*{pointer-events:auto}
+.top input{background:transparent;border:0;border-bottom:2px solid var(--line);color:var(--fg);font-size:24px;font-weight:700;width:min(560px,calc(100vw - 250px));padding:4px 2px}
+.top input:focus{border-bottom-color:var(--blue)}
+.top div{display:flex;gap:8px;flex-shrink:0}
+.top button{background:var(--bg2);color:var(--fg);font-size:14px;padding:8px 12px}
+main{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,520px);gap:0;align-items:start}
+.stage{padding:60px 20px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;min-height:100vh}
+.wheelbox{position:relative;width:min(100%,calc(100vh - 170px));width:min(100%,calc(100dvh - 170px));aspect-ratio:1}
+#wheel{width:100%;height:100%;display:block;border-radius:50%}
+.ptr{position:absolute;left:50%;top:-6px;transform:translateX(-50%);z-index:2;width:0;height:0;border-left:16px solid transparent;border-right:16px solid transparent;border-top:34px solid var(--fg)}
+.go{background:var(--red);font-size:26px;padding:16px 56px}
+.go:disabled{background:#95a5a6;cursor:not-allowed}
+.bar{display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap}
+.total{font-size:18px;color:var(--mut);white-space:nowrap}
+.total b{font-size:32px;color:var(--fg)}
+.panel{background:var(--bg2);padding:64px 20px 20px;min-height:100vh}
+.panel h2{font-size:18px;margin:0 0 12px;display:flex;justify-content:space-between;align-items:center}
+.panel h2:not(:first-child){margin-top:28px}
+.panel h2 button{background:#95a5a6;font-size:13px;padding:6px 10px}
+.row{display:grid;grid-template-columns:14px minmax(0,1fr) 62px 48px 62px 40px 30px;gap:6px;align-items:center;margin-bottom:6px;font-size:14px}
+.row.hd{color:var(--mut);font-size:12px;font-weight:600}
+.chip{width:14px;height:34px}
+.row .n{text-align:center;color:var(--mut)}
+.row .p{font-weight:700;text-align:center}
+.row .x{background:transparent;color:var(--mut);padding:4px;font-size:18px}
+.row .x:hover{color:var(--red);opacity:1}
+#add{background:var(--green);margin-top:6px}
+#hist{margin:0;padding:0;list-style:none;max-height:260px;overflow-y:auto;font-size:14px}
+#hist li{display:flex;justify-content:space-between;gap:8px;padding:7px 10px;background:var(--bg);margin-bottom:3px}
+#hist li span{color:var(--mut)}
+.empty{color:var(--mut);font-size:14px}
+.busy .panel,.busy .top div{pointer-events:none;opacity:.6}
+#modal{position:fixed;inset:0;background:rgba(44,62,80,.7);display:none;align-items:center;justify-content:center;z-index:20;padding:20px}
+#modal.on{display:flex}
+.card{padding:48px 56px;text-align:center;color:#fff;max-width:92vw}
+.card small{font-size:22px;opacity:.9}
+.card h3{font-size:clamp(36px,9vw,72px);margin:12px 0 28px;word-break:break-word}
+.card button{background:rgba(255,255,255,.25);font-size:18px;padding:12px 36px}
+.fs .panel{display:none}
+.fs main{grid-template-columns:1fr}
+.fs .wheelbox{width:min(100%,calc(100vh - 150px));width:min(100%,calc(100dvh - 150px))}
+@media(max-width:900px){main{grid-template-columns:1fr}.panel{min-height:0;padding-top:20px}.top input{font-size:18px;width:calc(100vw - 230px)}}
+@media(prefers-reduced-motion:reduce){#wheel{transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<nav class="top">
+  <input id="title" aria-label="活動名稱" maxlength="30">
+  <div><button id="snd">音效：開</button><button id="fs">全螢幕</button></div>
+</nav>
+<main>
+  <section class="stage">
+    <div class="wheelbox"><i class="ptr"></i><canvas id="wheel"></canvas></div>
+    <div class="bar"><button id="spin" class="go">開始抽獎</button>
+    <div class="total">已抽出 <b id="tot">0</b> 次</div></div>
+  </section>
+  <aside class="panel">
+    <h2>獎項設定</h2>
+    <div class="row hd"><span></span><span>獎項名稱</span><span>權重</span><span>機率</span><span>數量上限</span><span>已抽</span><span></span></div>
+    <div id="list"></div>
+    <button id="add">＋ 新增獎項</button>
+    <h2>中獎紀錄 <button id="clr">清空紀錄</button></h2>
+    <ol id="hist"></ol>
+  </aside>
+</main>
+<div id="modal"><div class="card" id="card"><small>恭喜抽中</small><h3 id="win"></h3><button id="ok">繼續</button></div></div>
+<script>
+const $=s=>document.querySelector(s);
+const COLORS=['#e74c3c','#f39c12','#f1c40f','#27ae60','#3498db','#9b59b6'];
+const DUR=1500, KEY='prize-wheel-edtech2026-v1';
+const uid=()=>Math.random().toString(36).slice(2,9);
+const defaults=()=>({title:'2026臺灣教育科技展 Wayground 抽獎 🎉',sound:true,history:[],prizes:[
+  {id:uid(),name:'Q卡 一組',w:5,limit:null},{id:uid(),name:'Wayground滑鼠墊',w:15,limit:null},
+  {id:uid(),name:'Wayground提袋',w:35,limit:null},{id:uid(),name:'Wayground筆記本',w:45,limit:null}]});
+let S;
+try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!S||!Array.isArray(S.prizes))S=defaults();
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const color=i=>COLORS[i%COLORS.length];
+const count=p=>S.history.filter(h=>h.id===p.id).length;
+const active=()=>S.prizes.map((p,i)=>({...p,i})).filter(p=>p.w>0&&(p.limit==null||count(p)<p.limit));
+const sumW=a=>a.reduce((s,p)=>s+p.w,0);
+let rot=0,busy=false;
+const cv=$('#wheel'),ctx=cv.getContext('2d');
+
+function draw(){
+  const size=cv.clientWidth,dpr=window.devicePixelRatio||1;
+  if(!size)return;
+  cv.width=cv.height=size*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,size,size);
+  const R=size/2-3,c=size/2,act=active(),tot=sumW(act);
+  ctx.save();ctx.translate(c,c);
+  if(!act.length){
+    ctx.fillStyle='#95a5a6';ctx.beginPath();ctx.arc(0,0,R,0,7);ctx.fill();
+    ctx.fillStyle='#fff';ctx.font='700 '+R*.09+'px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('沒有可抽的獎項',0,0);ctx.restore();return;
+  }
+  let a=-Math.PI/2;
+  act.forEach(p=>{
+    const sw=p.w/tot*Math.PI*2;
+    ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,R,a,a+sw);ctx.closePath();
+    ctx.fillStyle=color(p.i);ctx.fill();ctx.lineWidth=2;ctx.strokeStyle='#fff';ctx.stroke();
+    const FONT='"Open Sans","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif',t0=p.name||'(未命名)';ctx.font='700 100px '+FONT;const m=ctx.measureText(t0).width/100,half=Math.sin(Math.min(sw,Math.PI)/2);let fs=R*.14;for(;fs>8;fs-=.5){const w=m*fs;if(w<=R*.8&&fs*1.15<=2*(R-12-w)*half)break}
+    {
+      ctx.save();ctx.rotate(a+sw/2);
+      ctx.font='700 '+fs+'px '+FONT;
+      ctx.textAlign='right';ctx.textBaseline='middle';
+      ctx.fillStyle=color(p.i)==='#f1c40f'?'#2c3e50':'#fff';
+      const t=t0;
+      
+      
+      ctx.fillText(t,R-12,0);ctx.restore();
+    }
+    a+=sw;
+  });
+  ctx.beginPath();ctx.arc(0,0,R*.07,0,7);ctx.fillStyle='#fff';ctx.fill();
+  ctx.restore();
+}
+
+function beep(){
+  if(!S.sound)return;
+  try{const c=new(window.AudioContext||window.webkitAudioContext)();
+    [523,659,784].forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain(),t=c.currentTime+i*.12;
+      o.frequency.value=f;o.connect(g);g.connect(c.destination);
+      g.gain.setValueAtTime(.15,t);g.gain.exponentialRampToValueAtTime(.001,t+.2);o.start(t);o.stop(t+.22)})}catch(e){}
+}
+
+function spin(){
+  if(busy)return;
+  const act=active();if(!act.length)return;
+  busy=true;document.body.classList.add('busy');$('#spin').disabled=true;
+  const tot=sumW(act);let r=Math.random()*tot,acc=0,win=act[act.length-1],start=0;
+  for(const p of act){if(r<acc+p.w){win=p;start=acc;break}acc+=p.w}
+  if(win===act[act.length-1]&&r>=acc&&acc!==start)start=tot-win.w;
+  const target=(start+win.w*(.12+Math.random()*.76))/tot*360;
+  rot+=(((-target-rot)%360)+360)%360+360*3;
+  cv.style.transition='transform '+DUR+'ms cubic-bezier(.15,.7,.2,1)';
+  cv.style.transform='rotate('+rot+'deg)';
+  setTimeout(()=>finish(win),DUR+80);
+}
+
+function finish(p){
+  S.history.unshift({id:p.id,name:p.name||'(未命名)',t:Date.now()});save();
+  rot%=360;cv.style.transition='none';cv.style.transform='rotate('+rot+'deg)';
+  busy=false;document.body.classList.remove('busy');
+  $('#card').style.background=color(p.i);
+  $('#card').style.color=color(p.i)==='#f1c40f'?'#2c3e50':'#fff';
+  $('#win').textContent=p.name||'(未命名)';
+  $('#modal').classList.add('on');$('#ok').focus();beep();
+  draw();renderAll(false);
+}
+
+function closeModal(){$('#modal').classList.remove('on');$('#spin').disabled=!active().length;}
+
+function renderList(){
+  $('#list').innerHTML='';
+  S.prizes.forEach((p,i)=>{
+    const row=document.createElement('div');row.className='row';row.dataset.id=p.id;
+    row.innerHTML='<i class="chip" style="background:'+color(i)+'"></i>'+
+      '<input class="nm" maxlength="12" aria-label="獎項名稱">'+
+      '<input class="w" type="number" min="0" step="any" aria-label="權重">'+
+      '<span class="p"></span>'+
+      '<input class="lm" type="number" min="1" step="1" placeholder="不限" aria-label="數量上限">'+
+      '<span class="n"></span><button class="x" aria-label="刪除">×</button>';
+    row.querySelector('.nm').value=p.name;
+    row.querySelector('.w').value=p.w;
+    row.querySelector('.lm').value=p.limit==null?'':p.limit;
+    $('#list').appendChild(row);
+  });
+  updateStats();
+}
+
+function updateStats(){
+  const act=active(),tot=sumW(act);
+  S.prizes.forEach(p=>{
+    const row=document.querySelector('.row[data-id="'+p.id+'"]');if(!row)return;
+    const on=act.some(a=>a.id===p.id);
+    row.querySelector('.p').textContent=on?(p.w/tot*100).toFixed(1)+'%':'—';
+    row.querySelector('.n').textContent=count(p);
+    row.style.opacity=on?1:.55;
+  });
+  $('#tot').textContent=S.history.length;
+  $('#spin').disabled=busy||!act.length;
+}
+
+function renderHist(){
+  const h=$('#hist');
+  if(!S.history.length){h.innerHTML='<li class="empty">還沒有抽獎紀錄，按「開始抽獎」試試。</li>';return}
+  h.innerHTML=S.history.slice(0,100).map((x,i)=>{
+    const d=new Date(x.t),t=d.toLocaleTimeString('zh-TW',{hour12:false});
+    return '<li><b>#'+(S.history.length-i)+' '+x.name.replace(/[<>&]/g,'')+'</b><span>'+t+'</span></li>';
+  }).join('');
+}
+
+function renderAll(list=true){if(list)renderList();else updateStats();renderHist();}
+
+$('#list').addEventListener('input',e=>{
+  const row=e.target.closest('.row');if(!row)return;
+  const p=S.prizes.find(x=>x.id===row.dataset.id);if(!p)return;
+  if(e.target.classList.contains('nm'))p.name=e.target.value;
+  if(e.target.classList.contains('w'))p.w=Math.max(0,parseFloat(e.target.value)||0);
+  if(e.target.classList.contains('lm')){const v=parseInt(e.target.value,10);p.limit=v>0?v:null}
+  save();draw();updateStats();
+});
+$('#list').addEventListener('click',e=>{
+  if(!e.target.classList.contains('x'))return;
+  const id=e.target.closest('.row').dataset.id;
+  if(S.prizes.length<=2)return;
+  S.prizes=S.prizes.filter(p=>p.id!==id);save();draw();renderList();
+});
+$('#add').onclick=()=>{
+  if(S.prizes.length>=12)return;
+  S.prizes.push({id:uid(),name:'新獎項',w:10,limit:null});save();draw();renderList();
+};
+let clrT;
+$('#clr').onclick=function(){
+  if(this.dataset.arm){S.history=[];save();this.textContent='清空紀錄';delete this.dataset.arm;clearTimeout(clrT);draw();renderAll();return}
+  this.dataset.arm=1;this.textContent='再按一次確認';this.style.background='#e74c3c';
+  clrT=setTimeout(()=>{this.textContent='清空紀錄';this.style.background='';delete this.dataset.arm},3000);
+};
+$('#title').value=S.title;
+$('#title').oninput=e=>{S.title=e.target.value;document.title=S.title||'活動抽獎轉盤';save()};
+document.title=S.title||'活動抽獎轉盤';
+const sndLbl=()=>$('#snd').textContent='音效：'+(S.sound?'開':'關');
+$('#snd').onclick=()=>{S.sound=!S.sound;sndLbl();save()};sndLbl();
+$('#fs').onclick=()=>{
+  try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}
+  catch(e){document.body.classList.toggle('fs')}
+};
+document.addEventListener('fullscreenchange',()=>{document.body.classList.toggle('fs',!!document.fullscreenElement);draw()});
+$('#spin').onclick=spin;
+$('#ok').onclick=closeModal;
+$('#modal').onclick=e=>{if(e.target.id==='modal')closeModal()};
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')closeModal();
+  if(e.code==='Space'&&!/INPUT|BUTTON/.test(document.activeElement.tagName)&&!$('#modal').classList.contains('on')){e.preventDefault();spin()}
+});
+window.addEventListener('resize',draw);
+renderAll();draw();
+</script>
+</body>
+</html>
